@@ -1,3 +1,6 @@
+using DurableFunctionExtensions;
+using Microsoft.Build.Framework;
+
 namespace OrderingExample.Functions
 {
     using System.Threading;
@@ -5,7 +8,6 @@ namespace OrderingExample.Functions
     using DI;
     using Domain.Entities;
     using Domain.Events;
-    using DurableFunctionExtensions;
     using Microsoft.Azure.WebJobs;
     using Microsoft.Extensions.Logging;
     using Persistence;
@@ -39,8 +41,11 @@ namespace OrderingExample.Functions
             using (var timeoutCs = new CancellationTokenSource())
             {
                 var waitForCancel = context.WaitForExternalEvent(InternalEvents.OrderCancelled);
-                var waitForTimeout = context.CreateTimer(@event.CooldownPeriodExpires, timeoutCs.Token);
+
+                var waitForTimeout = context.CreateLongRunningTimer(@event.CooldownPeriodExpires, timeoutCs.Token);
+
                 log.LogInformation("Waiting for either a cooldown to expire OR the customer to cancel");
+
                 Task winner = await Task.WhenAny(waitForCancel, waitForTimeout);
                 if (winner == waitForCancel)
                 {
@@ -59,14 +64,6 @@ namespace OrderingExample.Functions
             }
         }
 
-        private static async Task CreateTimer(OrderPlaced @event, DurableOrchestrationContext context, CancellationToken timeoutCs)
-        {
-            if (@event.CooldownPeriodExpires > context.CurrentUtcDateTime)
-            {
-                await context.CreateLongRunningTimer(@event.CooldownPeriodExpires, timeoutCs);
-            }
-        }
-
         private static async Task CancelOrder(IAggregateRepository repository, ILogger log, OrderPlaced @event)
         {
             var order = await repository.Load<Order>(@event.OrderId);
@@ -80,7 +77,7 @@ namespace OrderingExample.Functions
 
         private static async Task ProvisionOrder(IAggregateRepository repository, ILogger log, OrderPlaced @event)
         {
-            log.LogInformation("The cooldown expired");
+            log.LogInformation($"The cooldown expired, so provisioning order {@event.OrderId} now");
             var order = await repository.Load<Order>(@event.OrderId);
 
             // order is ready to go, cooling period expired

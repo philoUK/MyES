@@ -8,13 +8,15 @@
         private const string Utcnow = "2009-10-20 09:00";
 
         [Theory]
-        [InlineData(Utcnow, "2009-10-20 09:00", 0)]
         [InlineData(Utcnow, "2009-10-20 08:59", 0)]
-        [InlineData(Utcnow, "2009-10-27 09:00", 1)]
+        [InlineData(Utcnow, "2009-10-20 09:00", 0)]
         [InlineData(Utcnow, "2009-10-25 23:58", 1)]
+        [InlineData(Utcnow, "2009-10-27 09:00", 1)]
+        [InlineData(Utcnow, "2009-10-27 09:01", 2)]
         [InlineData(Utcnow, "2009-11-03 09:00", 2)]
         [InlineData(Utcnow, "2009-11-03 09:01", 3)]
-        public async Task DateLessThanOrEqualToMaxFiresOneTimer(string utcString, string askedForString, int expectedTimerQuantity)
+        [InlineData(Utcnow, "2009-11-20 09:01", 5)]
+        public async Task CheckTheCorrectNumberOfTimersFire(string utcString, string askedForString, int expectedTimerQuantity)
         {
             var builder = new LongRunningTimeoutBuilder()
                 .WithUtcDateOf(utcString)

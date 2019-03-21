@@ -91,6 +91,7 @@
         void IDispatchAggregateEventsOf<OrderProvisioned>.Handle(OrderProvisioned @event)
         {
             this.isProvisioned = true;
+            this.coolDownPeriodEnds = null;
         }
     }
 }
