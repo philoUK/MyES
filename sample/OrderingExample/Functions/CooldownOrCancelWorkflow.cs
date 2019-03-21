@@ -1,6 +1,3 @@
-using DurableFunctionExtensions;
-using Microsoft.Build.Framework;
-
 namespace OrderingExample.Functions
 {
     using System.Threading;
@@ -8,9 +5,11 @@ namespace OrderingExample.Functions
     using DI;
     using Domain.Entities;
     using Domain.Events;
+    using DurableFunctionExtensions;
     using Microsoft.Azure.WebJobs;
     using Microsoft.Extensions.Logging;
     using Persistence;
+    using ILogger = Microsoft.Extensions.Logging.ILogger;
 
     public static class CooldownOrCancelWorkflow
     {
