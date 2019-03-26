@@ -5,6 +5,7 @@
     using Application.Services;
     using Azure;
     using Helpers;
+    using MediatRExtensions;
     using Microsoft.Extensions.Options;
     using Persistence;
     using Persistence.Azure;
@@ -14,6 +15,7 @@
     {
         public FunctionsRegistry()
         {
+            this.IncludeRegistry(new MediatrRegistry(typeof(ICustomerReadModel)));
             this.UseOptions<BlobStorageEventSubscriberRegistryConfig>("SubscriberRegistry");
             this.UseOptions<QueuedEventPublisherConfig>("EventPublisher");
             this.UseOptions<TableStorageEventStoreConfiguration>("EventStore");

@@ -34,6 +34,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\DurableFunctionExtensions\DurableFunctionExtensions.csproj" />
+    <ProjectReference Include="..\..\src\MediatRExtensions\MediatRExtensions.csproj" />
     <ProjectReference Include="..\..\src\Persistence.Azure\Persistence.Azure.csproj" />
     <ProjectReference Include="..\OrderingExample.Application\OrderingExample.Application.csproj" />
     <ProjectReference Include="..\OrderingExample.Azure\OrderingExample.Azure.csproj" />

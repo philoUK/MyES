@@ -1,23 +1,19 @@
-using DurableFunctionExtensions;
-using Microsoft.Build.Framework;
-
 namespace OrderingExample.Functions
 {
     using System.Threading;
     using System.Threading.Tasks;
     using DI;
-    using Domain.Entities;
     using Domain.Events;
+    using DurableFunctionExtensions;
+    using MediatR;
     using Microsoft.Azure.WebJobs;
     using Microsoft.Extensions.Logging;
-    using Persistence;
 
     public static class CooldownOrCancelWorkflow
     {
         [FunctionName("BeginCooldownOrCancel")]
         public static async Task RunOrchestrator(
             [OrchestrationTrigger] DurableOrchestrationContext context,
-            [Inject] IAggregateRepository repository,
             ILogger log)
         {
             var @event = context.GetInput<OrderPlaced>();
@@ -29,18 +25,17 @@ namespace OrderingExample.Functions
             // to pick up the data.
             log.LogInformation($"Pretending to send customer email to cancel order {instanceId}");
 
-            await WaitForEventOrTimeout(context, repository, log, @event);
+            await WaitForEventOrTimeout(context, log, @event);
         }
 
         private static async Task WaitForEventOrTimeout(
             DurableOrchestrationContext context,
-            IAggregateRepository repository,
             ILogger log,
             OrderPlaced @event)
         {
             using (var timeoutCs = new CancellationTokenSource())
             {
-                var waitForCancel = context.WaitForExternalEvent(InternalEvents.OrderCancelled);
+                var waitForCancel = context.WaitForExternalEvent(ExternalEvents.OrderCancelled);
 
                 var waitForTimeout = context.CreateLongRunningTimer(@event.CooldownPeriodExpires, timeoutCs.Token);
 
@@ -49,11 +44,11 @@ namespace OrderingExample.Functions
                 Task winner = await Task.WhenAny(waitForCancel, waitForTimeout);
                 if (winner == waitForCancel)
                 {
-                    await CancelOrder(repository, log, @event);
+                    await context.CallActivityAsync("CancelOrder_Activity", @event);
                 }
                 else if (winner == waitForTimeout)
                 {
-                    await ProvisionOrder(repository, log, @event);
+                    await context.CallActivityAsync("ProvisionOrder_Activity", @event);
                 }
 
                 if (!waitForTimeout.IsCompleted)
@@ -64,28 +59,24 @@ namespace OrderingExample.Functions
             }
         }
 
-        private static async Task CancelOrder(IAggregateRepository repository, ILogger log, OrderPlaced @event)
+        [FunctionName("CancelOrder_Activity")]
+        public static async Task CancelOrder(
+            [ActivityTrigger] OrderPlaced @event,
+            [Inject] IMediator mediator,
+            ILogger log)
         {
-            var order = await repository.Load<Order>(@event.OrderId);
-            log.LogInformation("The customer cancelled");
-            if (order != null)
-            {
-                order.Cancel("Customer requested cancellation");
-                await repository.Save(order);
-            }
+            // This should be a command that gets raised, and not the implementation, else we risk it happening more
+            // than one time
+            await mediator.Send(new Application.MediatrHandlers.CancelOrder.Command(@event.OrderId));
         }
 
-        private static async Task ProvisionOrder(IAggregateRepository repository, ILogger log, OrderPlaced @event)
+        [FunctionName("ProvisionOrder_Activity")]
+        public static async Task ProvisionOrder(
+            [ActivityTrigger] OrderPlaced @event,
+            [Inject] IMediator mediator,
+            ILogger log)
         {
-            log.LogInformation($"The cooldown expired, so provisioning order {@event.OrderId} now");
-            var order = await repository.Load<Order>(@event.OrderId);
-
-            // order is ready to go, cooling period expired
-            if (order != null)
-            {
-                order.Provision();
-                await repository.Save(order);
-            }
+            await mediator.Send(new Application.MediatrHandlers.ProvisionOrder.Command(@event.OrderId));
         }
 
         [FunctionName("Start")]

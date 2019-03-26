@@ -19,7 +19,7 @@ namespace OrderingExample.Functions
 
             log.LogInformation($"Going to cancel an order for instance id {instanceId}");
 
-            await client.RaiseEventAsync(instanceId, InternalEvents.OrderCancelled);
+            await client.RaiseEventAsync(instanceId, ExternalEvents.OrderCancelled);
 
             return new OkObjectResult("Sorry to see you leave");
         }
