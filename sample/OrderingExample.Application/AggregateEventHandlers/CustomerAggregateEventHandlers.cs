@@ -1,15 +1,15 @@
-﻿namespace OrderingExample.Application.Handlers
+﻿namespace OrderingExample.Application.AggregateEventHandlers
 {
     using System.Threading.Tasks;
     using Core;
     using Domain.Events;
     using ReadModels;
 
-    public class CustomerHandlers : IHandleAggregateEventsOf<OrderPlaced>, IHandleAggregateEventsOf<OrderProvisioned>, IHandleAggregateEventsOf<OrderCancelled>
+    public class CustomerAggregateEventHandlers : IHandleAggregateEventsOf<OrderPlaced>, IHandleAggregateEventsOf<OrderProvisioned>, IHandleAggregateEventsOf<OrderCancelled>
     {
         private readonly ICustomerReadModel readModel;
 
-        public CustomerHandlers(ICustomerReadModel readModel)
+        public CustomerAggregateEventHandlers(ICustomerReadModel readModel)
         {
             this.readModel = readModel;
         }

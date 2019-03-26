@@ -2,28 +2,33 @@ namespace OrderingExample.Functions
 {
     using System.Threading;
     using System.Threading.Tasks;
+    using Attributes;
     using DI;
     using Domain.Events;
     using DurableFunctionExtensions;
     using MediatR;
     using Microsoft.Azure.WebJobs;
-    using Microsoft.Extensions.Logging;
+    using Serilog;
 
     public static class CooldownOrCancelWorkflow
     {
         [FunctionName("BeginCooldownOrCancel")]
         public static async Task RunOrchestrator(
             [OrchestrationTrigger] DurableOrchestrationContext context,
-            ILogger log)
+            [Logger(Function = "BeginCooldownOrCancel")] ILogger log)
         {
             var @event = context.GetInput<OrderPlaced>();
             var instanceId = context.InstanceId;
-            log.LogInformation($"Starting the cooldown workflow for Order Id {@event.OrderId} and instanceId {instanceId}");
+            if (!context.IsReplaying)
+            {
+                log.Information("Starting the cooldown workflow for Order Id {OrderId} and instanceId {InstanceId}",
+                    @event.OrderId, instanceId);
+            }
 
             // send the customer an "email" asking them to respond with the Cancel message
             // the instance id is dead important -- this will allow the right instance of this workflow
             // to pick up the data.
-            log.LogInformation($"Pretending to send customer email to cancel order {instanceId}");
+            log.Information("Pretending to send customer email to cancel order {InstanceId}", instanceId);
 
             await WaitForEventOrTimeout(context, log, @event);
         }
@@ -39,15 +44,20 @@ namespace OrderingExample.Functions
 
                 var waitForTimeout = context.CreateLongRunningTimer(@event.CooldownPeriodExpires, timeoutCs.Token);
 
-                log.LogInformation("Waiting for either a cooldown to expire OR the customer to cancel");
+                if (!context.IsReplaying)
+                {
+                    log.Information("Waiting for either a cooldown to expire OR the customer to cancel");
+                }
 
                 Task winner = await Task.WhenAny(waitForCancel, waitForTimeout);
                 if (winner == waitForCancel)
                 {
+                    log.Information("Order {OrderId} was cancelled", @event.OrderId);
                     await context.CallActivityAsync("CancelOrder_Activity", @event);
                 }
                 else if (winner == waitForTimeout)
                 {
+                    log.Information("Order {OrderId} has cooled down and will be provisioned", @event.OrderId);
                     await context.CallActivityAsync("ProvisionOrder_Activity", @event);
                 }
 
@@ -63,10 +73,11 @@ namespace OrderingExample.Functions
         public static async Task CancelOrder(
             [ActivityTrigger] OrderPlaced @event,
             [Inject] IMediator mediator,
-            ILogger log)
+            [Logger(Function = "CancelOrder_Activity")] ILogger log)
         {
             // This should be a command that gets raised, and not the implementation, else we risk it happening more
             // than one time
+            log.Information("Cancelling order {OrderId}", @event.OrderId);
             await mediator.Send(new Application.MediatrHandlers.CancelOrder.Command(@event.OrderId));
         }
 
@@ -74,8 +85,9 @@ namespace OrderingExample.Functions
         public static async Task ProvisionOrder(
             [ActivityTrigger] OrderPlaced @event,
             [Inject] IMediator mediator,
-            ILogger log)
+            [Logger(Function = "ProvisionOrder_Activity")] ILogger log)
         {
+            log.Information("Provisioning order {OrderId}", @event.OrderId);
             await mediator.Send(new Application.MediatrHandlers.ProvisionOrder.Command(@event.OrderId));
         }
 
@@ -84,9 +96,9 @@ namespace OrderingExample.Functions
             [QueueTrigger("cooldowns", Connection = "AzureStorage")]
             OrderPlaced @event,
             [OrchestrationClient] DurableOrchestrationClient starter,
-            ILogger log)
+            [Logger(Function = "Start")] Serilog.ILogger log)
         {
-            log.LogInformation("Received an OrderPlaced event on the queeue -- starting a new workflow now");
+            log.Information("Received an OrderPlaced event on the queeue -- starting a new workflow now");
             await starter.StartNewAsync("BeginCooldownOrCancel", @event);
         }
     }

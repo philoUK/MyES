@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.Linq;
     using Core;
+    using Core.Utils;
     using Microsoft.WindowsAzure.Storage;
     using Microsoft.WindowsAzure.Storage.Blob;
     using Newtonsoft.Json;
@@ -39,8 +40,8 @@
         private bool ContainSubscription(Type eventType, Type subscriberType)
         {
             return this.registry.Subscriptions.Any(subscription =>
-                subscription.EventType == eventType.AssemblyQualifiedName &&
-                subscription.SubscriberType == subscriberType.AssemblyQualifiedName);
+                subscription.EventType == eventType.ToLoadableString() &&
+                subscription.SubscriberType == subscriberType.ToLoadableString());
         }
 
         private void GetSubscriberRegistry()
@@ -99,8 +100,8 @@
             {
                 var newEntry = new Subscription
                 {
-                    EventType = eventType.AssemblyQualifiedName,
-                    SubscriberType = subscriberTtpe.AssemblyQualifiedName
+                    EventType = eventType.ToLoadableString(),
+                    SubscriberType = subscriberTtpe.ToLoadableString()
                 };
                 this.subscriptions.Add(newEntry);
             }

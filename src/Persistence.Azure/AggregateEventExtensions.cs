@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.Linq;
     using Core;
+    using Core.Utils;
     using Newtonsoft.Json;
 
     internal static class AggregateEventExtensions
@@ -31,7 +32,7 @@
                 RowKey = ToEventFormat(@event.Version),
                 EventJson = JsonConvert.SerializeObject(@event),
                 EventName = @event.GetType().Name,
-                EventType = @event.GetType().AssemblyQualifiedName
+                EventType = @event.GetType().ToLoadableString()
             };
         }
 
@@ -68,8 +69,8 @@
             return new EventPublishedNotification
             {
                 EventJson = JsonConvert.SerializeObject(@event),
-                EventType = @event.GetType().AssemblyQualifiedName,
-                SubscriberType = subscriberType.AssemblyQualifiedName
+                EventType = @event.GetType().ToLoadableString(),
+                SubscriberType = subscriberType.ToLoadableString()
             };
         }
     }

@@ -1,6 +1,7 @@
-﻿namespace OrderingExample.DI
+﻿using OrderingExample.Application.AggregateEventHandlers;
+
+namespace OrderingExample.DI
 {
-    using Application.Handlers;
     using Application.ReadModels;
     using Application.Services;
     using Azure;

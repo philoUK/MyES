@@ -1,11 +1,11 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
-using MediatR;
-using OrderingExample.Domain.Entities;
-using Persistence;
-
-namespace OrderingExample.Application.MediatrHandlers
+﻿namespace OrderingExample.Application.MediatrHandlers
 {
+    using System.Threading;
+    using System.Threading.Tasks;
+    using Domain.Entities;
+    using MediatR;
+    using Persistence;
+
     public static class ProvisionOrder
     {
         public class Command : IRequest

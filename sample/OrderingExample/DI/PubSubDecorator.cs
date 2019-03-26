@@ -1,8 +1,9 @@
-﻿namespace OrderingExample.DI
+﻿using OrderingExample.Application.AggregateEventHandlers;
+
+namespace OrderingExample.DI
 {
     using System;
     using System.Collections.Generic;
-    using Application.Handlers;
     using Core;
     using Domain.Events;
     using Persistence.Azure;
@@ -14,12 +15,12 @@
         public PubSubDecorator(IEventSubscriberRegistry registry)
         {
             this.registry = registry;
-            this.registry.SubscribeToEvent(typeof(OrderPlaced), typeof(CustomerHandlers));
-            this.registry.SubscribeToEvent(typeof(OrderPlaced), typeof(OrderHandlers));
+            this.registry.SubscribeToEvent(typeof(OrderPlaced), typeof(CustomerAggregateEventHandlers));
+            this.registry.SubscribeToEvent(typeof(OrderPlaced), typeof(OrderAggregateEventHandlers));
             this.registry.SubscribeToEvent(typeof(OrderPlaced), typeof(KickOffCooldownWorkflowHandler));
-            this.registry.SubscribeToEvent(typeof(OrderCancelled), typeof(OrderHandlers));
-            this.registry.SubscribeToEvent(typeof(OrderCancelled), typeof(CustomerHandlers));
-            this.registry.SubscribeToEvent(typeof(OrderProvisioned), typeof(CustomerHandlers));
+            this.registry.SubscribeToEvent(typeof(OrderCancelled), typeof(OrderAggregateEventHandlers));
+            this.registry.SubscribeToEvent(typeof(OrderCancelled), typeof(CustomerAggregateEventHandlers));
+            this.registry.SubscribeToEvent(typeof(OrderProvisioned), typeof(CustomerAggregateEventHandlers));
         }
 
         public IEnumerable<Type> GetSubscribersForEvent(IAggregateEvent @event)

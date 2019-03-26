@@ -36,8 +36,4 @@
     <ProjectReference Include="..\OrderingExample.Domain\OrderingExample.Domain.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="NewFolder\" />
-  </ItemGroup>
-
 </Project>

@@ -1,7 +1,7 @@
 ﻿namespace OrderingExample.Azure
 {
     using System.Threading.Tasks;
-    using Application.Handlers;
+    using Application.AggregateEventHandlers;
     using Domain.Events;
     using Helpers;
 

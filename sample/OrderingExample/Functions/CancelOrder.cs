@@ -1,11 +1,11 @@
 namespace OrderingExample.Functions
 {
     using System.Threading.Tasks;
+    using Attributes;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Azure.WebJobs;
     using Microsoft.Azure.WebJobs.Extensions.Http;
-    using Microsoft.Extensions.Logging;
 
     public static class CancelOrder
     {
@@ -13,11 +13,11 @@ namespace OrderingExample.Functions
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
             [OrchestrationClient] DurableOrchestrationClient client,
-            ILogger log)
+            [Logger(Function = "CancelOrder")] Serilog.ILogger log)
         {
             string instanceId = req.Query["instanceId"];
 
-            log.LogInformation($"Going to cancel an order for instance id {instanceId}");
+            log.Information("Going to cancel an order for instance id {InstanceId}", instanceId);
 
             await client.RaiseEventAsync(instanceId, ExternalEvents.OrderCancelled);
 

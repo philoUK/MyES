@@ -4,6 +4,7 @@ namespace OrderingExample.Functions
     using System.Threading.Tasks;
     using Application.Services;
     using Application.Validators;
+    using Attributes;
     using DI;
     using Domain.Entities;
     using Microsoft.AspNetCore.Http;
@@ -11,16 +12,19 @@ namespace OrderingExample.Functions
     using Microsoft.Azure.WebJobs;
     using Microsoft.Azure.WebJobs.Extensions.Http;
     using Persistence;
+    using Serilog;
 
     public static class PlaceOrder
     {
         [FunctionName("PlaceAnOrder")]
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
+            [Logger(Function = "PlaceAnOrder")] ILogger log,
             [Inject] IAggregateRepository repository,
             [Inject] IOrderHistory orderHistory,
             [Inject] ICustomerHistory customerHistory)
         {
+            log.Information("PlaceOrder processing");
             var dict = req.GetQueryParameterDictionary();
 
             var validator = new PlaceOrderValidator();

@@ -1,4 +1,4 @@
-﻿namespace OrderingExample.Application.Handlers
+﻿namespace OrderingExample.Application.AggregateEventHandlers
 {
     using System.Threading.Tasks;
     using Core;

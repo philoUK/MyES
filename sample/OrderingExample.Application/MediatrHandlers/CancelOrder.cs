@@ -2,8 +2,8 @@
 {
     using System.Threading;
     using System.Threading.Tasks;
-    using MediatR;
     using Domain.Entities;
+    using MediatR;
     using Persistence;
 
     public static class CancelOrder
