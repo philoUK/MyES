@@ -1,3 +1,5 @@
+using System;
+
 namespace OrderingExample.Functions
 {
     using System.Threading;
@@ -21,8 +23,10 @@ namespace OrderingExample.Functions
             var instanceId = context.InstanceId;
             if (!context.IsReplaying)
             {
-                log.Information("Starting the cooldown workflow for Order Id {OrderId} and instanceId {InstanceId}",
-                    @event.OrderId, instanceId);
+                log.Information(
+                    "Starting the cooldown workflow for Order Id {OrderId} and instanceId {InstanceId}",
+                    @event.OrderId,
+                    instanceId);
             }
 
             // send the customer an "email" asking them to respond with the Cancel message
@@ -50,15 +54,17 @@ namespace OrderingExample.Functions
                 }
 
                 Task winner = await Task.WhenAny(waitForCancel, waitForTimeout);
+                var standardRetryOptions = new RetryOptions(TimeSpan.FromSeconds(5), 5);
+
                 if (winner == waitForCancel)
                 {
                     log.Information("Order {OrderId} was cancelled", @event.OrderId);
-                    await context.CallActivityAsync("CancelOrder_Activity", @event);
+                    await context.CallActivityWithRetryAsync("CancelOrder_Activity", standardRetryOptions, @event);
                 }
                 else if (winner == waitForTimeout)
                 {
                     log.Information("Order {OrderId} has cooled down and will be provisioned", @event.OrderId);
-                    await context.CallActivityAsync("ProvisionOrder_Activity", @event);
+                    await context.CallActivityWithRetryAsync("ProvisionOrder_Activity", standardRetryOptions, @event);
                 }
 
                 if (!waitForTimeout.IsCompleted)
