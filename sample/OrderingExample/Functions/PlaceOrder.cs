@@ -18,7 +18,7 @@ namespace OrderingExample.Functions
     {
         [FunctionName("PlaceAnOrder")]
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)] HttpRequest req,
             [Logger(Function = "PlaceAnOrder")] ILogger log,
             [Inject] IAggregateRepository repository,
             [Inject] IOrderHistory orderHistory,
