@@ -10,6 +10,10 @@
     {
         public class Command : IRequest
         {
+            public Command()
+            {
+            }
+
             public Command(string orderId)
             {
                 this.OrderId = orderId;

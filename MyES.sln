@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.329
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28729.10
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{8459901F-9254-429C-9AE1-36AD85E2AB75}"
 EndProject
@@ -35,11 +35,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DurableFunctionExtensions",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DurableFunctionExtensions.Tests", "tests\DurableFunctionExtensions.Tests\DurableFunctionExtensions.Tests.csproj", "{235640E6-E292-4994-8F0E-2B3FC1B41B89}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MediatRExtensions", "src\MediatRExtensions\MediatRExtensions.csproj", "{48C633E2-5388-4A3B-97CC-904AB6B87006}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MediatRExtensions", "src\MediatRExtensions\MediatRExtensions.csproj", "{48C633E2-5388-4A3B-97CC-904AB6B87006}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.Logging", "src\Logging\Core.Logging.csproj", "{15C7268E-1D44-4FA5-A777-9D3817B12FC1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core.Logging", "src\Logging\Core.Logging.csproj", "{15C7268E-1D44-4FA5-A777-9D3817B12FC1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.Utils", "src\Core.Utils\Core.Utils.csproj", "{49C3D55F-DE02-4349-86DD-5523AAA4E6C4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core.Utils", "src\Core.Utils\Core.Utils.csproj", "{49C3D55F-DE02-4349-86DD-5523AAA4E6C4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

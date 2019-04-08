@@ -1,7 +1,6 @@
-﻿using OrderingExample.Application.AggregateEventHandlers;
-
-namespace OrderingExample.DI
+﻿namespace OrderingExample.DI
 {
+    using Application.AggregateEventHandlers;
     using Application.ReadModels;
     using Application.Services;
     using Azure;
@@ -16,19 +15,21 @@ namespace OrderingExample.DI
     {
         public FunctionsRegistry()
         {
-            this.IncludeRegistry(new MediatrRegistry(typeof(ICustomerReadModel)));
+            this.IncludeRegistry(new MediatrRegistry(typeof(ICustomerReadModel), typeof(QueuedWrapper)));
             this.UseOptions<BlobStorageEventSubscriberRegistryConfig>("SubscriberRegistry");
             this.UseOptions<QueuedEventPublisherConfig>("EventPublisher");
             this.UseOptions<TableStorageEventStoreConfiguration>("EventStore");
             this.UseOptions<TableStorageCustomerReadModelConfiguration>("CustomerReadModel");
             this.UseOptions<TableStorageOrderReadModelConfiguration>("OrderReadModel");
             this.UseOptions<QueueCooldownWorkflowHandlerConfig>("Cooldown");
+            this.UseOptions<QueuedWrapperConfig>("QueuedWrapper");
             this.ForConfig<BlobStorageEventSubscriberRegistryConfig>();
             this.ForConfig<QueuedEventPublisherConfig>();
             this.ForConfig<TableStorageEventStoreConfiguration>();
             this.ForConfig<TableStorageCustomerReadModelConfiguration>();
             this.ForConfig<TableStorageOrderReadModelConfiguration>();
             this.ForConfig<QueueCooldownWorkflowHandlerConfig>();
+            this.ForConfig<QueuedWrapperConfig>();
             this.For<IEventSubscriberRegistry>().DecorateAllWith<PubSubDecorator>().Singleton();
             this.For<IEventSubscriberRegistry>().Use<BlobStorageEventSubsriberRegistry>();
             this.For<IAggregateEventPublisher>().Use<QueuedEventPublisher>();

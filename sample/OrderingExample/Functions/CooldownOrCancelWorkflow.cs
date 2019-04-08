@@ -1,7 +1,6 @@
-using System;
-
 namespace OrderingExample.Functions
 {
+    using System;
     using System.Threading;
     using System.Threading.Tasks;
     using Attributes;
@@ -9,6 +8,7 @@ namespace OrderingExample.Functions
     using Domain.Events;
     using DurableFunctionExtensions;
     using MediatR;
+    using MediatRExtensions;
     using Microsoft.Azure.WebJobs;
     using Serilog;
 
@@ -81,10 +81,10 @@ namespace OrderingExample.Functions
             [Inject] IMediator mediator,
             [Logger(Function = "CancelOrder_Activity")] ILogger log)
         {
-            // This should be a command that gets raised, and not the implementation, else we risk it happening more
-            // than one time
             log.Information("Cancelling order {OrderId}", @event.OrderId);
-            await mediator.Send(new Application.MediatrHandlers.CancelOrder.Command(@event.OrderId));
+            var innerCmd = new Application.MediatrHandlers.CancelOrder.Command(@event.OrderId);
+            var outerCmd = new QueuedWrapper.Command(innerCmd);
+            await mediator.Send(outerCmd);
         }
 
         [FunctionName("ProvisionOrder_Activity")]
@@ -94,7 +94,9 @@ namespace OrderingExample.Functions
             [Logger(Function = "ProvisionOrder_Activity")] ILogger log)
         {
             log.Information("Provisioning order {OrderId}", @event.OrderId);
-            await mediator.Send(new Application.MediatrHandlers.ProvisionOrder.Command(@event.OrderId));
+            var innerCmd = new Application.MediatrHandlers.ProvisionOrder.Command(@event.OrderId);
+            var outerCmd = new QueuedWrapper.Command(innerCmd);
+            await mediator.Send(outerCmd);
         }
 
         [FunctionName("Start")]

@@ -1,9 +1,8 @@
-﻿using OrderingExample.Application.AggregateEventHandlers;
-
-namespace OrderingExample.DI
+﻿namespace OrderingExample.DI
 {
     using System;
     using System.Collections.Generic;
+    using Application.AggregateEventHandlers;
     using Core;
     using Domain.Events;
     using Persistence.Azure;
