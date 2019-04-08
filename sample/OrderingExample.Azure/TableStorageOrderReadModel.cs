@@ -28,11 +28,6 @@
             await this.tableHelper.Insert(entity);
         }
 
-        public async Task RemoveOrder(string orderId)
-        {
-            await this.tableHelper.Delete(orderId, string.Empty);
-        }
-
         public async Task<bool> OrderExists(OrderNumber orderNumber)
         {
             var results = await this.tableHelper.GetItemsByPartitionKey<OrderReadModelEntity>(orderNumber.Value);

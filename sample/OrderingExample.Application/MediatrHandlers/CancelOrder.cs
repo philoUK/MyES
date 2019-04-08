@@ -19,7 +19,7 @@
                 this.OrderId = orderId;
             }
 
-            public string OrderId { get; }
+            public string OrderId { get; set; }
         }
 
         public class Handler : AsyncRequestHandler<Command>

@@ -6,7 +6,5 @@
     public interface IOrderReadModel
     {
         Task RecordNewOrder(string orderId, DateTime cooldownExpiry);
-
-        Task RemoveOrder(string orderId);
     }
 }

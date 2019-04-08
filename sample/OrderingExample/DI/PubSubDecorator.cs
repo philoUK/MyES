@@ -17,7 +17,6 @@
             this.registry.SubscribeToEvent(typeof(OrderPlaced), typeof(CustomerAggregateEventHandlers));
             this.registry.SubscribeToEvent(typeof(OrderPlaced), typeof(OrderAggregateEventHandlers));
             this.registry.SubscribeToEvent(typeof(OrderPlaced), typeof(KickOffCooldownWorkflowHandler));
-            this.registry.SubscribeToEvent(typeof(OrderCancelled), typeof(OrderAggregateEventHandlers));
             this.registry.SubscribeToEvent(typeof(OrderCancelled), typeof(CustomerAggregateEventHandlers));
             this.registry.SubscribeToEvent(typeof(OrderProvisioned), typeof(CustomerAggregateEventHandlers));
         }

@@ -1,6 +1,9 @@
 ﻿namespace OrderingExample.Application.Validators
 {
+    using System;
     using System.Collections.Generic;
+    using System.Linq;
+    using System.Runtime.Serialization;
 
     public class ValidationResult
     {
@@ -36,6 +39,11 @@
             var allRules = new List<string>(this.brokenRules);
             allRules.AddRange(rhs.brokenRules);
             return ValidationResult.Fails(allRules);
+        }
+
+        internal string ErrorList()
+        {
+            return this.Errors.Aggregate("", (prev, next) => prev + " " + next);
         }
     }
 }

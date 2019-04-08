@@ -6,12 +6,12 @@ namespace OrderingExample.Functions
     using Application.Validators;
     using Attributes;
     using DI;
-    using Domain.Entities;
+    using MediatR;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Azure.WebJobs;
     using Microsoft.Azure.WebJobs.Extensions.Http;
-    using Persistence;
+    using OrderingExample.Extensions;
     using Serilog;
 
     public static class PlaceOrder
@@ -20,9 +20,9 @@ namespace OrderingExample.Functions
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)] HttpRequest req,
             [Logger(Function = "PlaceAnOrder")] ILogger log,
-            [Inject] IAggregateRepository repository,
             [Inject] IOrderHistory orderHistory,
-            [Inject] ICustomerHistory customerHistory)
+            [Inject] ICustomerHistory customerHistory,
+            [Inject] IMediator mediator)
         {
             log.Information("PlaceOrder processing");
             var dict = req.GetQueryParameterDictionary();
@@ -40,9 +40,8 @@ namespace OrderingExample.Functions
                 return new BadRequestObjectResult(result.Errors);
             }
 
-            var order = new Order();
-            order.Place(validator.CustomerId, validator.OrderNumber);
-            await repository.Save(order);
+            var innerCmd = new Application.MediatrHandlers.PlaceOrder.Command(validator.OrderNumber, validator.CustomerId);
+            await innerCmd.SendViaMessageQueue(mediator);
             return new OkObjectResult("Thanks for placing an order");
         }
 

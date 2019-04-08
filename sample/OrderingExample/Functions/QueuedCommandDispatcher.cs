@@ -5,20 +5,19 @@ namespace OrderingExample.Functions
     using MediatR;
     using MediatRExtensions;
     using Microsoft.Azure.WebJobs;
-    using Microsoft.Extensions.Logging;
     using Newtonsoft.Json;
+    using OrderingExample.Attributes;
     using OrderingExample.DI;
 
     public static class QueuedCommandDispatcher
     {
         [FunctionName("QueuedCommandDispatcher")]
         public static async Task Run(
-            [QueueTrigger("queuedcommands", Connection = "AzureStorage")]QueuedWrapper.Command cmd,
-            ILogger log,
+            [QueueTrigger("commands", Connection = "AzureStorage")]QueuedWrapper.Command cmd,
+            [Logger(Function = "QueuedCommandDispatcher")] Serilog.ILogger log,
             [Inject]IMediator mediator)
         {
-            var innerCmdType = Type.GetType(cmd.WrappedType);
-            var innerCmd = JsonConvert.DeserializeObject(cmd.WrappedJson, innerCmdType);
+            var innerCmd = JsonConvert.DeserializeObject(cmd.WrappedJson, Type.GetType(cmd.WrappedType));
             await mediator.Send((IRequest)innerCmd);
         }
     }

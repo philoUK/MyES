@@ -5,7 +5,7 @@
     using Domain.Events;
     using ReadModels;
 
-    public class OrderAggregateEventHandlers : IHandleAggregateEventsOf<OrderPlaced>, IHandleAggregateEventsOf<OrderCancelled>
+    public class OrderAggregateEventHandlers : IHandleAggregateEventsOf<OrderPlaced>
     {
         private readonly IOrderReadModel readModel;
 
@@ -17,11 +17,6 @@
         public async Task HandleAsync(OrderPlaced @event)
         {
             await this.readModel.RecordNewOrder(@event.OrderId, @event.CooldownPeriodExpires);
-        }
-
-        public async Task HandleAsync(OrderCancelled @event)
-        {
-            await this.readModel.RemoveOrder(@event.OrderId);
         }
     }
 }

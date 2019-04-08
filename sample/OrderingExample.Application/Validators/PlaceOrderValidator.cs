@@ -13,6 +13,15 @@
         public OrderNumber OrderNumber { get; private set; }
 
         public async Task<ValidationResult> Validate(
+            OrderNumber orderNumber,
+            CustomerId customerId,
+            IOrderHistory orderHistory,
+            ICustomerHistory customerHistory)
+        {
+            return await this.Validate(orderNumber.Value, customerId.Value, orderHistory, customerHistory);
+        }
+
+        public async Task<ValidationResult> Validate(
             string rawOrderNumber,
             string rawCustomerId,
             IOrderHistory orderHistory,

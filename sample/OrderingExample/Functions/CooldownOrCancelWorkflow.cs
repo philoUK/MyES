@@ -8,8 +8,8 @@ namespace OrderingExample.Functions
     using Domain.Events;
     using DurableFunctionExtensions;
     using MediatR;
-    using MediatRExtensions;
     using Microsoft.Azure.WebJobs;
+    using OrderingExample.Extensions;
     using Serilog;
 
     public static class CooldownOrCancelWorkflow
@@ -32,7 +32,10 @@ namespace OrderingExample.Functions
             // send the customer an "email" asking them to respond with the Cancel message
             // the instance id is dead important -- this will allow the right instance of this workflow
             // to pick up the data.
-            log.Information("Pretending to send customer email to cancel order {InstanceId}", instanceId);
+            if (!context.IsReplaying)
+            {
+                log.Information("Pretending to send customer email to cancel order {InstanceId}", instanceId);
+            }
 
             await WaitForEventOrTimeout(context, log, @event);
         }
@@ -58,12 +61,10 @@ namespace OrderingExample.Functions
 
                 if (winner == waitForCancel)
                 {
-                    log.Information("Order {OrderId} was cancelled", @event.OrderId);
                     await context.CallActivityWithRetryAsync("CancelOrder_Activity", standardRetryOptions, @event);
                 }
                 else if (winner == waitForTimeout)
                 {
-                    log.Information("Order {OrderId} has cooled down and will be provisioned", @event.OrderId);
                     await context.CallActivityWithRetryAsync("ProvisionOrder_Activity", standardRetryOptions, @event);
                 }
 
@@ -83,8 +84,7 @@ namespace OrderingExample.Functions
         {
             log.Information("Cancelling order {OrderId}", @event.OrderId);
             var innerCmd = new Application.MediatrHandlers.CancelOrder.Command(@event.OrderId);
-            var outerCmd = new QueuedWrapper.Command(innerCmd);
-            await mediator.Send(outerCmd);
+            await innerCmd.SendViaMessageQueue(mediator);
         }
 
         [FunctionName("ProvisionOrder_Activity")]
@@ -95,8 +95,7 @@ namespace OrderingExample.Functions
         {
             log.Information("Provisioning order {OrderId}", @event.OrderId);
             var innerCmd = new Application.MediatrHandlers.ProvisionOrder.Command(@event.OrderId);
-            var outerCmd = new QueuedWrapper.Command(innerCmd);
-            await mediator.Send(outerCmd);
+            await innerCmd.SendViaMessageQueue(mediator);
         }
 
         [FunctionName("Start")]
