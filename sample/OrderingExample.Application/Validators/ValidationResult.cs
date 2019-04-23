@@ -43,7 +43,7 @@
 
         internal string ErrorList()
         {
-            return this.Errors.Aggregate("", (prev, next) => prev + " " + next);
+            return this.Errors.Aggregate(string.Empty, (prev, next) => prev + " " + next);
         }
     }
 }

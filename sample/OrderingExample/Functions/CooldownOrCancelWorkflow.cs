@@ -7,9 +7,9 @@ namespace OrderingExample.Functions
     using DI;
     using Domain.Events;
     using DurableFunctionExtensions;
+    using Extensions;
     using MediatR;
     using Microsoft.Azure.WebJobs;
-    using OrderingExample.Extensions;
     using Serilog;
 
     public static class CooldownOrCancelWorkflow
@@ -29,9 +29,6 @@ namespace OrderingExample.Functions
                     instanceId);
             }
 
-            // send the customer an "email" asking them to respond with the Cancel message
-            // the instance id is dead important -- this will allow the right instance of this workflow
-            // to pick up the data.
             if (!context.IsReplaying)
             {
                 log.Information("Pretending to send customer email to cancel order {InstanceId}", instanceId);

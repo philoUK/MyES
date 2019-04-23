@@ -5,6 +5,6 @@
 
     public interface ICooldownWorkflowHandler
     {
-        Task Handle(OrderPlaced @event);
+        Task Handle(OrderPlaced message);
     }
 }

@@ -14,10 +14,10 @@
             this.config = config;
         }
 
-        public async Task Handle(OrderPlaced @event)
+        public async Task Handle(OrderPlaced message)
         {
             var forwarder = new EventForwarder(this.config.ConnectionString, this.config.QueueName);
-            await forwarder.Handle(@event);
+            await forwarder.Handle(message);
         }
     }
 }

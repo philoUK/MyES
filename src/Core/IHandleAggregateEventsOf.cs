@@ -10,6 +10,6 @@
     public interface IHandleAggregateEventsOf<in T>
         where T : IAggregateEvent
     {
-        Task HandleAsync(T @event);
+        Task HandleAsync(T message);
     }
 }
