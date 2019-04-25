@@ -6,12 +6,12 @@ namespace OrderingExample.Functions
     using Application.Validators;
     using Attributes;
     using DI;
+    using Extensions;
     using MediatR;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Azure.WebJobs;
     using Microsoft.Azure.WebJobs.Extensions.Http;
-    using OrderingExample.Extensions;
     using Serilog;
 
     public static class PlaceOrder

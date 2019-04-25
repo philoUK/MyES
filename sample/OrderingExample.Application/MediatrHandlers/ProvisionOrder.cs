@@ -36,6 +36,7 @@
                 var order = await this.repository.Load<Order>(request.OrderId);
                 if (order != null)
                 {
+                    order.Provision();
                     await this.repository.Save(order);
                 }
             }

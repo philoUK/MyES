@@ -4,6 +4,7 @@ namespace OrderingExample.Functions
     using System.Threading;
     using System.Threading.Tasks;
     using Attributes;
+    using Config;
     using DI;
     using Domain.Events;
     using DurableFunctionExtensions;
@@ -97,7 +98,7 @@ namespace OrderingExample.Functions
 
         [FunctionName("Start")]
         public static async Task Run(
-            [QueueTrigger("cooldowns", Connection = "AzureStorage")]
+            [QueueTrigger(QueueNames.Cooldowns, Connection = "AzureStorage")]
             OrderPlaced @event,
             [OrchestrationClient] DurableOrchestrationClient starter,
             [Logger(Function = "Start")] Serilog.ILogger log)

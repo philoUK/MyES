@@ -30,7 +30,7 @@
             this.aggregate.events.Add(@event);
         }
 
-        internal void InvokeReducer(IAggregateEvent @event)
+        private void InvokeReducer(IAggregateEvent @event)
         {
             this.aggregate.Version = @event.Version;
             this.aggregate.ConsumeDispatchedEvent(@event);

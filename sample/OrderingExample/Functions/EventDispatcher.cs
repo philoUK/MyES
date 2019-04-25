@@ -2,6 +2,7 @@ namespace OrderingExample.Functions
 {
     using System.Threading.Tasks;
     using Attributes;
+    using Config;
     using DI;
     using Helpers;
     using Microsoft.Azure.WebJobs;
@@ -12,7 +13,7 @@ namespace OrderingExample.Functions
     {
         [FunctionName("EventDispatcher")]
         public static async Task Run(
-            [QueueTrigger("events", Connection = "AzureStorage")]EventPublishedNotification myQueueItem,
+            [QueueTrigger(QueueNames.Events, Connection = "AzureStorage")]EventPublishedNotification myQueueItem,
             [Logger(Function="EventDispatcher")] ILogger log,
             [Inject]IHandlerFactory factory)
         {

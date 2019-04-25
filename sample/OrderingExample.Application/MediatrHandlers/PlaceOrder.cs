@@ -3,12 +3,12 @@
     using System;
     using System.Threading;
     using System.Threading.Tasks;
+    using Domain.Entities;
+    using Domain.ValueTypes;
     using MediatR;
-    using OrderingExample.Application.Services;
-    using OrderingExample.Application.Validators;
-    using OrderingExample.Domain.Entities;
-    using OrderingExample.Domain.ValueTypes;
     using Persistence;
+    using Services;
+    using Validators;
 
     public static class PlaceOrder
     {

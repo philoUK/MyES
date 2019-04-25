@@ -4,6 +4,7 @@
     using Application.ReadModels;
     using Application.Services;
     using Azure;
+    using Config;
     using Helpers;
     using MediatRExtensions;
     using Microsoft.Extensions.Options;
@@ -16,20 +17,13 @@
         public FunctionsRegistry()
         {
             this.IncludeRegistry(new MediatrRegistry(typeof(ICustomerReadModel), typeof(QueuedWrapper)));
-            this.UseOptions<BlobStorageEventSubscriberRegistryConfig>("SubscriberRegistry");
-            this.UseOptions<QueuedEventPublisherConfig>("EventPublisher");
-            this.UseOptions<TableStorageEventStoreConfiguration>("EventStore");
-            this.UseOptions<TableStorageCustomerReadModelConfiguration>("CustomerReadModel");
-            this.UseOptions<TableStorageOrderReadModelConfiguration>("OrderReadModel");
-            this.UseOptions<QueueCooldownWorkflowHandlerConfig>("Cooldown");
-            this.UseOptions<QueuedWrapperConfig>("QueuedWrapper");
-            this.ForConfig<BlobStorageEventSubscriberRegistryConfig>();
-            this.ForConfig<QueuedEventPublisherConfig>();
-            this.ForConfig<TableStorageEventStoreConfiguration>();
-            this.ForConfig<TableStorageCustomerReadModelConfiguration>();
-            this.ForConfig<TableStorageOrderReadModelConfiguration>();
-            this.ForConfig<QueueCooldownWorkflowHandlerConfig>();
-            this.ForConfig<QueuedWrapperConfig>();
+            this.ForConfig<BlobStorageEventSubscriberRegistryConfig>("SubscriberRegistry");
+            this.ForConfig<QueuedEventPublisherConfig>("EventPublisher");
+            this.ForConfig<TableStorageEventStoreConfiguration>("EventStore");
+            this.ForConfig<TableStorageCustomerReadModelConfiguration>("CustomerReadModel");
+            this.ForConfig<TableStorageOrderReadModelConfiguration>("OrderReadModel");
+            this.ForConfig<QueueCooldownWorkflowHandlerConfig>("Cooldown");
+            this.ForConfig<QueuedWrapperConfig>("QueuedWrapper");
             this.For<IEventSubscriberRegistry>().DecorateAllWith<PubSubDecorator>().Singleton();
             this.For<IEventSubscriberRegistry>().Use<BlobStorageEventSubsriberRegistry>();
             this.For<IAggregateEventPublisher>().Use<QueuedEventPublisher>();
@@ -43,9 +37,10 @@
             this.For<ICooldownWorkflowHandler>().Use<QueueCooldownWorkflowHandler>();
         }
 
-        private void ForConfig<T>()
+        private void ForConfig<T>(string configSection)
             where T : class, new()
         {
+            this.For<IOptions<T>>().Use(() => new OptionsProvider<T>(configSection)).Singleton();
             this.For<T>().Use(ctx => ctx.GetInstance<IOptions<T>>().Value);
         }
     }
